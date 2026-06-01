@@ -21547,6 +21547,169 @@ public func FfiConverterTypeRoomInfo_lower(_ value: RoomInfo) -> RustBuffer {
 }
 
 
+/**
+ * Inputs handed to a [`RoomKeyForwardingPolicy`] when a cross-user room-key
+ * request is being authorized.
+ */
+public struct RoomKeyForwardingAuthorization: Equatable, Hashable {
+    public var roomId: String
+    public var sessionId: String
+    public var senderKey: String
+    public var requesterUserId: String
+    public var requesterDeviceId: String
+    public var requestId: String
+    public var requestedMessageIndex: UInt32
+    public var responderFirstKnownIndex: UInt32
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(roomId: String, sessionId: String, senderKey: String, requesterUserId: String, requesterDeviceId: String, requestId: String, requestedMessageIndex: UInt32, responderFirstKnownIndex: UInt32) {
+        self.roomId = roomId
+        self.sessionId = sessionId
+        self.senderKey = senderKey
+        self.requesterUserId = requesterUserId
+        self.requesterDeviceId = requesterDeviceId
+        self.requestId = requestId
+        self.requestedMessageIndex = requestedMessageIndex
+        self.responderFirstKnownIndex = responderFirstKnownIndex
+    }
+
+    
+
+    
+}
+
+#if compiler(>=6)
+extension RoomKeyForwardingAuthorization: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeRoomKeyForwardingAuthorization: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> RoomKeyForwardingAuthorization {
+        return
+            try RoomKeyForwardingAuthorization(
+                roomId: FfiConverterString.read(from: &buf), 
+                sessionId: FfiConverterString.read(from: &buf), 
+                senderKey: FfiConverterString.read(from: &buf), 
+                requesterUserId: FfiConverterString.read(from: &buf), 
+                requesterDeviceId: FfiConverterString.read(from: &buf), 
+                requestId: FfiConverterString.read(from: &buf), 
+                requestedMessageIndex: FfiConverterUInt32.read(from: &buf), 
+                responderFirstKnownIndex: FfiConverterUInt32.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: RoomKeyForwardingAuthorization, into buf: inout [UInt8]) {
+        FfiConverterString.write(value.roomId, into: &buf)
+        FfiConverterString.write(value.sessionId, into: &buf)
+        FfiConverterString.write(value.senderKey, into: &buf)
+        FfiConverterString.write(value.requesterUserId, into: &buf)
+        FfiConverterString.write(value.requesterDeviceId, into: &buf)
+        FfiConverterString.write(value.requestId, into: &buf)
+        FfiConverterUInt32.write(value.requestedMessageIndex, into: &buf)
+        FfiConverterUInt32.write(value.responderFirstKnownIndex, into: &buf)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeRoomKeyForwardingAuthorization_lift(_ buf: RustBuffer) throws -> RoomKeyForwardingAuthorization {
+    return try FfiConverterTypeRoomKeyForwardingAuthorization.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeRoomKeyForwardingAuthorization_lower(_ value: RoomKeyForwardingAuthorization) -> RustBuffer {
+    return FfiConverterTypeRoomKeyForwardingAuthorization.lower(value)
+}
+
+
+/**
+ * The decision returned by a [`RoomKeyForwardingPolicy`].
+ */
+public struct RoomKeyForwardingDecision: Equatable, Hashable {
+    /**
+     * Whether the requester may receive the forwarded key.
+     */
+    public var allow: Bool
+    /**
+     * The earliest Megolm index that may be exported. `None` keeps the default
+     * (the responder's first known index).
+     */
+    public var exportIndex: UInt32?
+    /**
+     * Optional human-readable reason, used for logging.
+     */
+    public var reason: String?
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(
+        /**
+         * Whether the requester may receive the forwarded key.
+         */allow: Bool, 
+        /**
+         * The earliest Megolm index that may be exported. `None` keeps the default
+         * (the responder's first known index).
+         */exportIndex: UInt32?, 
+        /**
+         * Optional human-readable reason, used for logging.
+         */reason: String?) {
+        self.allow = allow
+        self.exportIndex = exportIndex
+        self.reason = reason
+    }
+
+    
+
+    
+}
+
+#if compiler(>=6)
+extension RoomKeyForwardingDecision: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeRoomKeyForwardingDecision: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> RoomKeyForwardingDecision {
+        return
+            try RoomKeyForwardingDecision(
+                allow: FfiConverterBool.read(from: &buf), 
+                exportIndex: FfiConverterOptionUInt32.read(from: &buf), 
+                reason: FfiConverterOptionString.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: RoomKeyForwardingDecision, into buf: inout [UInt8]) {
+        FfiConverterBool.write(value.allow, into: &buf)
+        FfiConverterOptionUInt32.write(value.exportIndex, into: &buf)
+        FfiConverterOptionString.write(value.reason, into: &buf)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeRoomKeyForwardingDecision_lift(_ buf: RustBuffer) throws -> RoomKeyForwardingDecision {
+    return try FfiConverterTypeRoomKeyForwardingDecision.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeRoomKeyForwardingDecision_lower(_ value: RoomKeyForwardingDecision) -> RustBuffer {
+    return FfiConverterTypeRoomKeyForwardingDecision.lower(value)
+}
+
+
 public struct RoomKeyRecoveryProgress: Equatable, Hashable {
     public var roomId: String
     public var sessionId: String
@@ -24881,6 +25044,10 @@ public struct WidgetCapabilities: Equatable, Hashable {
      * This allows the widget to send events with a delay.
      */
     public var sendDelayedEvent: Bool
+    /**
+     * This allows the widget to download files (avatars)
+     */
+    public var downloadFiles: Bool
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
@@ -24903,12 +25070,16 @@ public struct WidgetCapabilities: Equatable, Hashable {
          */updateDelayedEvent: Bool, 
         /**
          * This allows the widget to send events with a delay.
-         */sendDelayedEvent: Bool) {
+         */sendDelayedEvent: Bool, 
+        /**
+         * This allows the widget to download files (avatars)
+         */downloadFiles: Bool) {
         self.read = read
         self.send = send
         self.requiresClient = requiresClient
         self.updateDelayedEvent = updateDelayedEvent
         self.sendDelayedEvent = sendDelayedEvent
+        self.downloadFiles = downloadFiles
     }
 
     
@@ -24931,7 +25102,8 @@ public struct FfiConverterTypeWidgetCapabilities: FfiConverterRustBuffer {
                 send: FfiConverterSequenceTypeWidgetEventFilter.read(from: &buf), 
                 requiresClient: FfiConverterBool.read(from: &buf), 
                 updateDelayedEvent: FfiConverterBool.read(from: &buf), 
-                sendDelayedEvent: FfiConverterBool.read(from: &buf)
+                sendDelayedEvent: FfiConverterBool.read(from: &buf), 
+                downloadFiles: FfiConverterBool.read(from: &buf)
         )
     }
 
@@ -24941,6 +25113,7 @@ public struct FfiConverterTypeWidgetCapabilities: FfiConverterRustBuffer {
         FfiConverterBool.write(value.requiresClient, into: &buf)
         FfiConverterBool.write(value.updateDelayedEvent, into: &buf)
         FfiConverterBool.write(value.sendDelayedEvent, into: &buf)
+        FfiConverterBool.write(value.downloadFiles, into: &buf)
     }
 }
 
@@ -41856,7 +42029,7 @@ public func FfiConverterCallbackInterfaceRoomInfoListener_lower(_ v: RoomInfoLis
 
 public protocol RoomKeyForwardingPolicy: AnyObject, Sendable {
     
-    func shouldForwardRoomKey(roomId: String, sessionId: String, senderKey: String, requesterUserId: String, requesterDeviceId: String)  -> Bool
+    func allowForwarding(authorization: RoomKeyForwardingAuthorization)  -> RoomKeyForwardingDecision
     
 }
 
@@ -41884,32 +42057,24 @@ fileprivate struct UniffiCallbackInterfaceRoomKeyForwardingPolicy {
                 fatalError("Uniffi callback interface RoomKeyForwardingPolicy: handle missing in uniffiClone")
             }
         },
-        shouldForwardRoomKey: { (
+        allowForwarding: { (
             uniffiHandle: UInt64,
-            roomId: RustBuffer,
-            sessionId: RustBuffer,
-            senderKey: RustBuffer,
-            requesterUserId: RustBuffer,
-            requesterDeviceId: RustBuffer,
-            uniffiOutReturn: UnsafeMutablePointer<Int8>,
+            authorization: RustBuffer,
+            uniffiOutReturn: UnsafeMutablePointer<RustBuffer>,
             uniffiCallStatus: UnsafeMutablePointer<RustCallStatus>
         ) in
             let makeCall = {
-                () throws -> Bool in
+                () throws -> RoomKeyForwardingDecision in
                 guard let uniffiObj = try? FfiConverterCallbackInterfaceRoomKeyForwardingPolicy.handleMap.get(handle: uniffiHandle) else {
                     throw UniffiInternalError.unexpectedStaleHandle
                 }
-                return uniffiObj.shouldForwardRoomKey(
-                     roomId: try FfiConverterString.lift(roomId),
-                     sessionId: try FfiConverterString.lift(sessionId),
-                     senderKey: try FfiConverterString.lift(senderKey),
-                     requesterUserId: try FfiConverterString.lift(requesterUserId),
-                     requesterDeviceId: try FfiConverterString.lift(requesterDeviceId)
+                return uniffiObj.allowForwarding(
+                     authorization: try FfiConverterTypeRoomKeyForwardingAuthorization_lift(authorization)
                 )
             }
 
             
-            let writeReturn = { uniffiOutReturn.pointee = FfiConverterBool.lower($0) }
+            let writeReturn = { uniffiOutReturn.pointee = FfiConverterTypeRoomKeyForwardingDecision_lower($0) }
             uniffiTraitInterfaceCall(
                 callStatus: uniffiCallStatus,
                 makeCall: makeCall,
@@ -50027,7 +50192,7 @@ private let initializationResult: InitializationResult = {
     if (uniffi_matrix_sdk_ffi_checksum_method_recoverystatelistener_on_update() != 34195) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_matrix_sdk_ffi_checksum_method_roomkeyforwardingpolicy_should_forward_room_key() != 27994) {
+    if (uniffi_matrix_sdk_ffi_checksum_method_roomkeyforwardingpolicy_allow_forwarding() != 42448) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_matrix_sdk_ffi_checksum_method_verificationstatelistener_on_update() != 33992) {
