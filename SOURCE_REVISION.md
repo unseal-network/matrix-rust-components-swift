@@ -6,5 +6,5 @@
 - Artifact repository: `git@pagepeek:unseal-network/matrix-rust-components-swift.git`
 - Artifact version: `26.05.29`
 - Binary asset: `https://github.com/unseal-network/matrix-rust-components-swift/releases/download/26.05.29/MatrixSDKFFI.xcframework.zip`
-- Binary checksum: `c85facf06551d94298bd4dcac63ff48c8ce8c364b297bfae5c9df1d0cdfdc785`
+- Binary checksum: `5b926d1d75c5b51ac992a45667cd439e7e907248c6d3e181266ceb70ea639299`
 - Platforms: iOS device and iOS simulator
