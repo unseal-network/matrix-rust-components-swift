@@ -2,7 +2,7 @@
 
 import PackageDescription
 
-let checksum = "5b926d1d75c5b51ac992a45667cd439e7e907248c6d3e181266ceb70ea639299"
+let checksum = "1562c0dbda8ba25df67d48264a5c96105ca8ed583a8132f841ed0e5a25d6d5c9"
 let version = "26.05.29"
 let url = "https://github.com/unseal-network/matrix-rust-components-swift/releases/download/\(version)/MatrixSDKFFI.xcframework.zip"
 
