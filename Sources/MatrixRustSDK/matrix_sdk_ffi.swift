@@ -27205,6 +27205,12 @@ public enum EncryptedMessage: Equatable, Hashable {
     )
     case megolmV1AesSha2(
         /**
+         * The Curve25519 key of the sender.
+         */senderKey: String?, 
+        /**
+         * The ID of the sending device.
+         */deviceId: String?, 
+        /**
          * The ID of the session used to encrypt the message.
          */sessionId: String, 
         /**
@@ -27237,7 +27243,7 @@ public struct FfiConverterTypeEncryptedMessage: FfiConverterRustBuffer {
         case 1: return .olmV1Curve25519AesSha2(senderKey: try FfiConverterString.read(from: &buf)
         )
         
-        case 2: return .megolmV1AesSha2(sessionId: try FfiConverterString.read(from: &buf), cause: try FfiConverterTypeUtdCause.read(from: &buf)
+        case 2: return .megolmV1AesSha2(senderKey: try FfiConverterOptionString.read(from: &buf), deviceId: try FfiConverterOptionString.read(from: &buf), sessionId: try FfiConverterString.read(from: &buf), cause: try FfiConverterTypeUtdCause.read(from: &buf)
         )
         
         case 3: return .unknown
@@ -27255,8 +27261,10 @@ public struct FfiConverterTypeEncryptedMessage: FfiConverterRustBuffer {
             FfiConverterString.write(senderKey, into: &buf)
             
         
-        case let .megolmV1AesSha2(sessionId,cause):
+        case let .megolmV1AesSha2(senderKey,deviceId,sessionId,cause):
             writeInt(&buf, Int32(2))
+            FfiConverterOptionString.write(senderKey, into: &buf)
+            FfiConverterOptionString.write(deviceId, into: &buf)
             FfiConverterString.write(sessionId, into: &buf)
             FfiConverterTypeUtdCause.write(cause, into: &buf)
             
