@@ -926,6 +926,20 @@ public protocol ClientProtocol: AnyObject, Sendable {
     
     func deviceId() throws  -> String
     
+    /**
+     * Discover the RTC transports advertised by the homeserver.
+     *
+     * The transports are first looked up through the authenticated
+     * `GET /_matrix/client/v1/rtc/transports` endpoint (MSC4143). If the
+     * homeserver doesn't implement that endpoint, this falls back to the
+     * `m.rtc_foci` field of the well-known.
+     *
+     * Returns `None` if neither source could provide transports, which is kept
+     * distinct from an empty list, i.e. a homeserver that advertises no
+     * transports at all.
+     */
+    func discoverRtcTransports() async throws  -> [RtcTransport]?
+    
     func displayName() async throws  -> String
     
     /**
@@ -1189,6 +1203,8 @@ public protocol ClientProtocol: AnyObject, Sendable {
     func registerNotificationHandler(listener: SyncNotificationListener) async 
     
     func removeAvatar() async throws 
+    
+    func requestOpenidToken() async throws  -> OpenIdToken
     
     /**
      * Empty the server version and unstable features cache.
@@ -1789,6 +1805,35 @@ open func deviceId()throws  -> String  {
             self.uniffiCloneHandle(),$0
     )
 })
+}
+    
+    /**
+     * Discover the RTC transports advertised by the homeserver.
+     *
+     * The transports are first looked up through the authenticated
+     * `GET /_matrix/client/v1/rtc/transports` endpoint (MSC4143). If the
+     * homeserver doesn't implement that endpoint, this falls back to the
+     * `m.rtc_foci` field of the well-known.
+     *
+     * Returns `None` if neither source could provide transports, which is kept
+     * distinct from an empty list, i.e. a homeserver that advertises no
+     * transports at all.
+     */
+open func discoverRtcTransports()async throws  -> [RtcTransport]?  {
+    return
+        try  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_matrix_sdk_ffi_fn_method_client_discover_rtc_transports(
+                    self.uniffiCloneHandle()
+                    
+                )
+            },
+            pollFunc: ffi_matrix_sdk_ffi_rust_future_poll_rust_buffer,
+            completeFunc: ffi_matrix_sdk_ffi_rust_future_complete_rust_buffer,
+            freeFunc: ffi_matrix_sdk_ffi_rust_future_free_rust_buffer,
+            liftFunc: FfiConverterOptionSequenceTypeRtcTransport.lift,
+            errorHandler: FfiConverterTypeClientError_lift
+        )
 }
     
 open func displayName()async throws  -> String  {
@@ -2650,6 +2695,23 @@ open func removeAvatar()async throws   {
             completeFunc: ffi_matrix_sdk_ffi_rust_future_complete_void,
             freeFunc: ffi_matrix_sdk_ffi_rust_future_free_void,
             liftFunc: { $0 },
+            errorHandler: FfiConverterTypeClientError_lift
+        )
+}
+    
+open func requestOpenidToken()async throws  -> OpenIdToken  {
+    return
+        try  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_matrix_sdk_ffi_fn_method_client_request_openid_token(
+                    self.uniffiCloneHandle()
+                    
+                )
+            },
+            pollFunc: ffi_matrix_sdk_ffi_rust_future_poll_rust_buffer,
+            completeFunc: ffi_matrix_sdk_ffi_rust_future_complete_rust_buffer,
+            freeFunc: ffi_matrix_sdk_ffi_rust_future_free_rust_buffer,
+            liftFunc: FfiConverterTypeOpenIdToken_lift,
             errorHandler: FfiConverterTypeClientError_lift
         )
 }
@@ -7945,6 +8007,23 @@ public protocol RoomProtocol: AnyObject, Sendable {
      */
     func sendRaw(eventType: String, content: String) async throws 
     
+    /**
+     * Send a raw state event to the room.
+     *
+     * # Arguments
+     *
+     * * `event_type` - The type of the state event to send (e.g.
+     * `"m.room.name"` or a custom type).
+     *
+     * * `state_key` - A unique key which defines the overwriting semantics for
+     * this piece of room state. This is often an empty string.
+     *
+     * * `content` - The content of the state event encoded as a JSON string.
+     *
+     * Returns the event ID of the newly created state event.
+     */
+    func sendStateEventRaw(eventType: String, stateKey: String, content: String) async throws  -> String
+    
     func setIsFavourite(isFavourite: Bool, tagOrder: Double?) async throws 
     
     func setIsLowPriority(isLowPriority: Bool, tagOrder: Double?) async throws 
@@ -9479,6 +9558,38 @@ open func sendRaw(eventType: String, content: String)async throws   {
             completeFunc: ffi_matrix_sdk_ffi_rust_future_complete_void,
             freeFunc: ffi_matrix_sdk_ffi_rust_future_free_void,
             liftFunc: { $0 },
+            errorHandler: FfiConverterTypeClientError_lift
+        )
+}
+    
+    /**
+     * Send a raw state event to the room.
+     *
+     * # Arguments
+     *
+     * * `event_type` - The type of the state event to send (e.g.
+     * `"m.room.name"` or a custom type).
+     *
+     * * `state_key` - A unique key which defines the overwriting semantics for
+     * this piece of room state. This is often an empty string.
+     *
+     * * `content` - The content of the state event encoded as a JSON string.
+     *
+     * Returns the event ID of the newly created state event.
+     */
+open func sendStateEventRaw(eventType: String, stateKey: String, content: String)async throws  -> String  {
+    return
+        try  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_matrix_sdk_ffi_fn_method_room_send_state_event_raw(
+                    self.uniffiCloneHandle(),
+                    FfiConverterString.lower(eventType),FfiConverterString.lower(stateKey),FfiConverterString.lower(content)
+                )
+            },
+            pollFunc: ffi_matrix_sdk_ffi_rust_future_poll_rust_buffer,
+            completeFunc: ffi_matrix_sdk_ffi_rust_future_complete_rust_buffer,
+            freeFunc: ffi_matrix_sdk_ffi_rust_future_free_rust_buffer,
+            liftFunc: FfiConverterString.lift,
             errorHandler: FfiConverterTypeClientError_lift
         )
 }
@@ -20096,6 +20207,68 @@ public func FfiConverterTypeOidcCrossSigningResetInfo_lift(_ buf: RustBuffer) th
 #endif
 public func FfiConverterTypeOidcCrossSigningResetInfo_lower(_ value: OidcCrossSigningResetInfo) -> RustBuffer {
     return FfiConverterTypeOidcCrossSigningResetInfo.lower(value)
+}
+
+
+public struct OpenIdToken: Equatable, Hashable {
+    public var accessToken: String
+    public var tokenType: String
+    public var matrixServerName: String
+    public var expiresInSeconds: UInt64
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(accessToken: String, tokenType: String, matrixServerName: String, expiresInSeconds: UInt64) {
+        self.accessToken = accessToken
+        self.tokenType = tokenType
+        self.matrixServerName = matrixServerName
+        self.expiresInSeconds = expiresInSeconds
+    }
+
+    
+
+    
+}
+
+#if compiler(>=6)
+extension OpenIdToken: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeOpenIdToken: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> OpenIdToken {
+        return
+            try OpenIdToken(
+                accessToken: FfiConverterString.read(from: &buf), 
+                tokenType: FfiConverterString.read(from: &buf), 
+                matrixServerName: FfiConverterString.read(from: &buf), 
+                expiresInSeconds: FfiConverterUInt64.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: OpenIdToken, into buf: inout [UInt8]) {
+        FfiConverterString.write(value.accessToken, into: &buf)
+        FfiConverterString.write(value.tokenType, into: &buf)
+        FfiConverterString.write(value.matrixServerName, into: &buf)
+        FfiConverterUInt64.write(value.expiresInSeconds, into: &buf)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeOpenIdToken_lift(_ buf: RustBuffer) throws -> OpenIdToken {
+    return try FfiConverterTypeOpenIdToken.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeOpenIdToken_lower(_ value: OpenIdToken) -> RustBuffer {
+    return FfiConverterTypeOpenIdToken.lower(value)
 }
 
 
@@ -36244,6 +36417,100 @@ public func FfiConverterTypeRtcNotificationType_lower(_ value: RtcNotificationTy
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
+/**
+ * Information about a MatrixRTC transport advertised by the homeserver.
+ */
+
+public enum RtcTransport: Equatable, Hashable {
+    
+    /**
+     * A LiveKit RTC transport.
+     */
+    case liveKit(
+        /**
+         * The URL of the LiveKit service.
+         */serviceUrl: String
+    )
+    /**
+     * A transport type the SDK doesn't know about, up for interpretation by
+     * the consumer.
+     */
+    case custom(
+        /**
+         * The value of the `type` field of the transport.
+         */transportType: String, 
+        /**
+         * The remaining transport data, as a serialized JSON object. It
+         * doesn't contain the `type` field.
+         */data: String
+    )
+
+
+
+
+
+}
+
+#if compiler(>=6)
+extension RtcTransport: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeRtcTransport: FfiConverterRustBuffer {
+    typealias SwiftType = RtcTransport
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> RtcTransport {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+        
+        case 1: return .liveKit(serviceUrl: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 2: return .custom(transportType: try FfiConverterString.read(from: &buf), data: try FfiConverterString.read(from: &buf)
+        )
+        
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: RtcTransport, into buf: inout [UInt8]) {
+        switch value {
+        
+        
+        case let .liveKit(serviceUrl):
+            writeInt(&buf, Int32(1))
+            FfiConverterString.write(serviceUrl, into: &buf)
+            
+        
+        case let .custom(transportType,data):
+            writeInt(&buf, Int32(2))
+            FfiConverterString.write(transportType, into: &buf)
+            FfiConverterString.write(data, into: &buf)
+            
+        }
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeRtcTransport_lift(_ buf: RustBuffer) throws -> RtcTransport {
+    return try FfiConverterTypeRtcTransport.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeRtcTransport_lower(_ value: RtcTransport) -> RustBuffer {
+    return FfiConverterTypeRtcTransport.lower(value)
+}
+
+
+// Note that we don't yet support `indirect` for enums.
+// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 
 public enum RuleKind: Equatable, Hashable {
     
@@ -46771,6 +47038,30 @@ fileprivate struct FfiConverterOptionSequenceTypeAction: FfiConverterRustBuffer 
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
+fileprivate struct FfiConverterOptionSequenceTypeRtcTransport: FfiConverterRustBuffer {
+    typealias SwiftType = [RtcTransport]?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterSequenceTypeRtcTransport.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterSequenceTypeRtcTransport.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
 fileprivate struct FfiConverterOptionDictionaryStringInt64: FfiConverterRustBuffer {
     typealias SwiftType = [String: Int64]?
 
@@ -47868,6 +48159,31 @@ fileprivate struct FfiConverterSequenceTypeRoomMessageEventMessageType: FfiConve
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
+fileprivate struct FfiConverterSequenceTypeRtcTransport: FfiConverterRustBuffer {
+    typealias SwiftType = [RtcTransport]
+
+    public static func write(_ value: [RtcTransport], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterTypeRtcTransport.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [RtcTransport] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [RtcTransport]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterTypeRtcTransport.read(from: &buf))
+        }
+        return seq
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
 fileprivate struct FfiConverterSequenceTypeSlidingSyncVersion: FfiConverterRustBuffer {
     typealias SwiftType = [SlidingSyncVersion]
 
@@ -48790,6 +49106,9 @@ private let initializationResult: InitializationResult = {
     if (uniffi_matrix_sdk_ffi_checksum_method_client_device_id() != 63337) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_matrix_sdk_ffi_checksum_method_client_discover_rtc_transports() != 12625) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_matrix_sdk_ffi_checksum_method_client_display_name() != 20054) {
         return InitializationResult.apiChecksumMismatch
     }
@@ -48923,6 +49242,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_matrix_sdk_ffi_checksum_method_client_remove_avatar() != 12536) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_matrix_sdk_ffi_checksum_method_client_request_openid_token() != 19654) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_matrix_sdk_ffi_checksum_method_client_reset_supported_versions() != 12909) {
@@ -49565,6 +49887,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_matrix_sdk_ffi_checksum_method_room_send_raw() != 63831) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_matrix_sdk_ffi_checksum_method_room_send_state_event_raw() != 55730) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_matrix_sdk_ffi_checksum_method_room_set_is_favourite() != 1289) {

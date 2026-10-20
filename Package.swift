@@ -2,14 +2,14 @@
 
 import PackageDescription
 
-let checksum = "52375a9df92ded7c386db73e0c01cc8b5cb3460fc0fff7fcbb28e7233ae8536d"
-let binaryArtifactVersion = "26.06.18"
+let checksum = "e4a5fce17e7b3ab3290407b2944140de3270ac5339f48c26245a80a77e4cd2a1"
+let binaryArtifactVersion = "26.10.20"
 let url = "https://github.com/unseal-network/matrix-rust-components-swift/releases/download/\(binaryArtifactVersion)/MatrixSDKFFI.xcframework.zip"
 
 let package = Package(
     name: "MatrixRustSDK",
     platforms: [
-        .iOS(.v15),
+        .iOS("18.0"),
     ],
     products: [
         .library(
